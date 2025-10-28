@@ -73,6 +73,7 @@ uint8_t read_pin(GPIO_TypeDef* GPIOx, uint8_t pin);
 void toggle_pin(GPIO_TypeDef* GPIOx, uint8_t pin);
 void init_sys_tick(uint32_t ticks);
 void delay_us(uint32_t us);
+void init_adv_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t cnt_enable, uint8_t pwm_enable);
 void init_gp_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t enable);
 void init_timer_IRQ(TIM_TypeDef* TIMx, uint16_t priority);
 void init_ssd (uint16_t reload_time);

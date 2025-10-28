@@ -146,6 +146,29 @@ void init_sys_tick(uint32_t ticks){
     return;
 }
 
+void init_adv_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t cnt_enable, uint8_t pwm_enable){
+    if(TIMx->CR1 & TIM_CR1_CEN){
+        return;
+    }
+    switch((int)TIMx){
+        case (int)TIM1:
+            RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+            break;
+        case (int)TIM8:
+            RCC->APB2ENR |= RCC_APB2ENR_TIM8EN;
+            break;
+        default:
+            return;
+    }
+
+    TIMx->PSC = (SYSTEM_FREQ / freq) - 1;
+    TIMx->ARR = arr;
+    TIMx->CCMR1 |= pwm_enable ? TIM_CCMR1_OC1M_1: 0;
+    TIMx->CNT = 0;
+    TIMx->CR1 |= cnt_enable ? TIM_CR1_CEN : 0;
+    return;
+}
+
 void init_gp_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t enable){
     if(TIMx->CR1 & TIM_CR1_CEN){
         return;
@@ -182,15 +205,13 @@ void init_gp_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t enabl
             RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
             break;
         default:
-            break;
+            return;
     }
 
     TIMx->PSC = (SYSTEM_FREQ / freq) - 1;
     TIMx->ARR = arr;
     TIMx->CNT = 0;
-    if(enable){
-        TIMx->CR1 |= TIM_CR1_CEN;
-    }
+    TIMx->CR1 |= (TIM_CR1_CEN & enable);
     return;
 }
 
@@ -242,7 +263,7 @@ void init_timer_IRQ(TIM_TypeDef* TIMx, uint16_t priority){
     }
 }
 
-void init_ssd( uint16_t reload_time){
+void init_ssd(uint16_t reload_time){
     for(int i = 0; i < 3; i++){
         init_gpio(SSD.GPIO_PORTS[i]);
     }
