@@ -21,6 +21,8 @@ void PWM_PC6_INIT(void){
 }
 
 int main(void) {
+    init_ssd(10);
+    display_num(0, 1);
     PWM_PC6_INIT();
 
     while(1){};
