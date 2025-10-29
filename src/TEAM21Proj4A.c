@@ -22,5 +22,7 @@ void PWM_PC6_INIT(void){
 
 int main(void) {
     PWM_PC6_INIT();
+
+    while(1){};
     return 0;
 }
