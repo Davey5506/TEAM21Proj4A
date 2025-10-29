@@ -6,6 +6,13 @@
 #define TIM3_ARR (TIM3_FREQ_HZ * PWM_FREQ_HZ) // Auto-reload value for 50Hz
 #define SERVO_NEUTRAL_PULSE_WIDTH 1500 // 1.5ms pulse width for neutral position
 
+volatile float rpm = 0; //Rotational Speed in RPM
+
+void print_data(void){
+    float rpm_local = rpm;
+    display_num((uint16_t)(rpm_local * 10), 1); //Display RPM with one decimal place
+}
+
 void PWM_PC6_INIT(void){
     init_gpio(GPIOC);
     set_pin_mode(GPIOC, 6, AF);
