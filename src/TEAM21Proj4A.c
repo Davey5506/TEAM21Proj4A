@@ -8,6 +8,10 @@
 
 volatile float rpm = 0; //Rotational Speed in RPM
 
+void SYSTICK_Handler(void){
+    
+}
+
 void print_data(void){
     float rpm_local = rpm;
     display_num((uint16_t)(rpm_local * 10), 1); //Display RPM with one decimal place
@@ -28,6 +32,7 @@ void PWM_PC6_INIT(void){
 }
 
 int main(void) {
+    init_sys_tick(SYSTEM_FREQ); // 1s tick
     init_ssd(10);
     display_num(0, 1);
     PWM_PC6_INIT();
