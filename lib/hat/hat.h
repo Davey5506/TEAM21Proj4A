@@ -83,8 +83,9 @@ void init_ssd (uint16_t reload_time);
 void display_num(uint16_t num, uint8_t decimal_place);
 
 // Advanced IO functions
-void init_usart(uint32_t baudrate);
-void send_char(USART_TypeDef* USARTx, char c);
+void init_usart(const uint32_t baudrate);
+void send_char(USART_TypeDef* USARTx, const char c);
+void send_string(USART_TypeDef* USARTx, const char* str);
 void init_ultrasound(void);
 void int_to_string(int num, char* str, uint16_t len);
 void init_servo(SERVO_t* servo);
