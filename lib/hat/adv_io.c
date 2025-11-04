@@ -7,7 +7,7 @@ volatile const ULTRA_SOUND_t ULTRA_SOUND = {
     .ECHO_PIN = 0
 };
 
-void init_usart(uint32_t baudrate){
+void init_usart(const uint32_t baudrate){
     RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
     init_gpio(GPIOA);
     set_pin_mode(GPIOA, 2, AF);
@@ -19,9 +19,18 @@ void init_usart(uint32_t baudrate){
     return;
 }
 
-void send_char(USART_TypeDef* USARTx, char c){
+void send_char(USART_TypeDef* USARTx, const char c){
     while(!(USARTx->SR & USART_SR_TXE));
     USARTx->DR = c;
+    return;
+}
+
+void send_string(USART_TypeDef* USARTx, const char* str){
+    int i = 0;
+    while(str[i] != '\0'){
+        send_char(USARTx, str[i]);
+        i++;
+    }
     return;
 }
 
