@@ -44,3 +44,20 @@ void init_servo(SERVO_t* servo){
         servo->SERVO_PIN_PORT->AFR[0] |= (3 << (servo->SERVO_PWM_PIN * 4));
     }
 }
+
+void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
+    switch((uint32_t)ADCx){
+        case (uint32_t)ADC1:
+            RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+            break;
+        case (uint32_t)ADC2:
+            RCC->APB2ENR |= RCC_APB2ENR_ADC2EN;
+            break;
+        case (uint32_t)ADC3:
+            RCC->APB2ENR |= RCC_APB2ENR_ADC3EN;
+            break;
+        default:
+            return;
+    }
+    ADCx->SQR3 = channel;
+}
