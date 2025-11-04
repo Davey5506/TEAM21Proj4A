@@ -8,9 +8,13 @@
 #define SERVO_NEUTRAL_PULSE_WIDTH 1500 // 1.5ms pulse width for neutral position
 
 volatile float rpm = 0; //Rotational Speed in RPM
+volatile uint16_t adc_value = 0; //ADC Value
 
 void SYSTICK_Handler(void){
-    
+    adc_value = read_adc(ADC1, ADC_CHANNEL); //Read ADC value from channel 10 (PC0)
+    char string[20];
+    sprintf(string, "ADC Value: %u\r\n", adc_value);
+    send_string(USART2, string);
 }
 
 void print_data(void){
@@ -33,10 +37,12 @@ void PWM_PC6_INIT(void){
 }
 
 int main(void) {
+    init_usart(115200);
     init_sys_tick(SYSTEM_FREQ); // 1s tick
     init_ssd(10);
     display_num(0, 1);
     PWM_PC6_INIT();
+    init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
 
     while(1){};
     return 0;
