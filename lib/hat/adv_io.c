@@ -46,6 +46,7 @@ void init_servo(SERVO_t* servo){
 }
 
 void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
+    // Enable ADC clock
     switch((uint32_t)ADCx){
         case (uint32_t)ADC1:
             RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
@@ -58,6 +59,16 @@ void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
             break;
         default:
             return;
-    }
-    ADCx->SQR3 = channel;
+    };
+    ADCx->SQR1 |= ((0) << ADC_SQR1_L_Pos); // Set number of active chennels
+    ADCx->SQR3 |= (channel << ADC_SQR3_SQ1_Pos); // Set channel to read
+    ADCx->CR1 |= (0 << ADC_CR1_RES_Pos); // 12-bit resolution
+    ADCx->CR2 &= ~ADC_CR2_ALIGN; // Right data alignment
+    ADCx->CR2 |= ADC_CR2_ADON; // Enable ADC
+}
+
+uint16_t read_adc(ADC_TypeDef* ADCx){
+    ADCx->CR2 |= ADC_CR2_SWSTART;
+    while(!(ADCx->SR & ADC_SR_EOC));
+    return (uint16_t)(ADCx->DR);
 }
