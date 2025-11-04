@@ -1,6 +1,7 @@
 #include "hat.h"
 #include <stdio.h>
 
+#define ADC_CHANNEL 10 // PC0
 #define PWM_FREQ_HZ 50
 #define TIM3_FREQ_HZ 1000 // 1kHz timer clock for 1us resolution
 #define TIM3_ARR (TIM3_FREQ_HZ * PWM_FREQ_HZ) // Auto-reload value for 50Hz
