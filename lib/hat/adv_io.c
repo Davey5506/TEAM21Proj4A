@@ -76,8 +76,11 @@ void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
     ADCx->CR2 |= ADC_CR2_ADON; // Enable ADC
 }
 
-uint16_t read_adc(ADC_TypeDef* ADCx){
+uint16_t read_adc(ADC_TypeDef* ADCx, uint8_t channel){
     ADCx->CR2 |= ADC_CR2_SWSTART;
+    ADCx->SQR3 |= (channel << ADC_SQR3_SQ1_Pos); //set channel to read
+
+    ADCx->CR2 |= ADC_CR2_SWSTART; //starts conversion
     while(!(ADCx->SR & ADC_SR_EOC));
     return (uint16_t)(ADCx->DR);
 }
