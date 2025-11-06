@@ -86,10 +86,13 @@ void display_num(uint16_t num, uint8_t decimal_place);
 void init_usart(const uint32_t baudrate);
 void send_char(USART_TypeDef* USARTx, const char c);
 void send_string(USART_TypeDef* USARTx, const char* str);
+void init_adc_interrupt(ADC_TypeDef* ADCx, uint8_t priority);
 void init_ultrasound(void);
 void int_to_string(int num, char* str, uint16_t len);
 void init_servo(SERVO_t* servo);
 void init_adc(ADC_TypeDef* ADCx, uint8_t channel);
+void adc_swtstart(ADC_TypeDef* ADCx);
+void init_adc_interrupt(ADC_TypeDef* ADCx, uint8_t priority);
 uint16_t read_adc(ADC_TypeDef* ADCx);
 
 
