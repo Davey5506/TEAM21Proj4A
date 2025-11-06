@@ -36,7 +36,7 @@ void init_ssd(uint16_t reload_time){
 
     RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
     TIM7->DIER |= TIM_DIER_UIE;
-    TIM7->PSC = SYSTEM_FREQ / (160000 - 1);
+    TIM7->PSC = (SYSTEM_FREQ / 160000) - 1;
     TIM7->ARR = reload_time;
     NVIC_EnableIRQ(TIM7_IRQn);
     NVIC_SetPriority(TIM7_IRQn, 20); 
