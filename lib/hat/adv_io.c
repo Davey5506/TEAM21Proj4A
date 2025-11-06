@@ -90,7 +90,5 @@ void init_adc_interrupt(ADC_TypeDef* ADCx, uint8_t priority){
 }
 
 uint16_t read_adc(ADC_TypeDef* ADCx){
-    ADCx->CR2 |= ADC_CR2_SWSTART;
-    while(!(ADCx->SR & ADC_SR_EOC));
     return (uint16_t)(ADCx->DR);
 }
