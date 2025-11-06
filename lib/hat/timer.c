@@ -8,6 +8,13 @@ void init_sys_tick(uint32_t ticks){
     return;
 }
 
+void delay_us(uint32_t us){
+    uint32_t start = SysTick->VAL;
+    uint32_t ticks = us * (SYSTEM_FREQ / 1000000);
+    while((start - SysTick->VAL) < ticks){};
+    return;
+}
+
 void init_adv_timer(TIM_TypeDef* TIMx, uint32_t freq, uint32_t arr, uint8_t cnt_enable, uint8_t pwm_enable){
     if(TIMx->CR1 & TIM_CR1_CEN){
         return;
