@@ -41,6 +41,11 @@ void TIM3_IRQHandler(void){
 }
 
 
+void EXTI15_10_IRQHandler(void){
+    
+}
+
+
 
 int main(void) {
     init_usart(115200);
