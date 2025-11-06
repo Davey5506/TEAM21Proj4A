@@ -69,9 +69,10 @@ void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
         default:
             return;
     };
-    ADCx->SQR1 |= ((0) << ADC_SQR1_L_Pos); // Set number of active chennels
-    ADCx->SQR3 |= (channel << ADC_SQR3_SQ1_Pos); // Set channel to read
-    ADCx->CR1 |= (0 << ADC_CR1_RES_Pos); // 12-bit resolution
+    ADCx->SQR1 &= ~ADC_SQR1_L; // Set number of active channels to 1
+    ADCx->SQR3 = (channel << ADC_SQR3_SQ1_Pos); // Set channel to read
+    ADCx->SMPR1 |= ADC_SMPR1_SMP10_2 | ADC_SMPR1_SMP10_1 | ADC_SMPR1_SMP10_0; // 480 cycles sample time for channel 10
+    ADCx->CR1 &= ~ADC_CR1_RES; // 12-bit resolution
     ADCx->CR2 &= ~ADC_CR2_ALIGN; // Right data alignment
     ADCx->CR2 |= ADC_CR2_ADON; // Enable ADC
 }
