@@ -108,7 +108,6 @@ int main(void) {
     set_pin_mode(GPIOC, 0, ANALOG); //PC0 as analog input for ADC
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
     init_adc_interrupt(ADC1, 2); // Enable ADC interrupt with priority 2
-    send_string(USART2, "System Initialized\r\n");
 
     while(1){
         if(value_ready){
