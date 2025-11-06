@@ -36,6 +36,12 @@ void PWM_PC6_INIT(void){
     TIM3->CR1 |= TIM_CR1_CEN; //Enable TIM3
 }
 
+void TIM3_IRQHandler(void){
+
+}
+
+
+
 int main(void) {
     init_usart(115200);
     init_sys_tick(SYSTEM_FREQ); // 1s tick
