@@ -11,8 +11,12 @@
 #define CW_MIN_PULSE 1280
 #define CCW_MAX_PULSE 1520
 #define CCW_MIN_PULSE 1720
-#define PWN_OUT_PIN 6 // PC6 for PWM output to servo
-#define FEEDBACK_IN_PIN 7 // PC7 for feedback input from servo
+
+SERVO_t wheel = {
+    .SERVO_PIN_PORT = GPIOC,
+    .SERVO_PWM_PIN = 6,
+    .SERVO_FEEDBACK_PIN = 7
+};
 
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint32_t period = 0; 
