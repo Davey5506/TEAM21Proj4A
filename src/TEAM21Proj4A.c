@@ -16,6 +16,7 @@
 
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint32_t period = 0; 
+volatile uint8_t direction = 0; // 0 for CW, 1 for CCW
 
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
@@ -84,7 +85,18 @@ void TIM3_IRQHandler(void){ //meaures pulse width and period of feedback signal
 }
 
 void EXTI15_10_IRQHandler(void){
+    if(EXTI->PR & EXTI_PR_PR13){
+        EXTI->PR |= EXTI_PR_PR13; //Clear pending register
+        direction ^= 1; //Toggle direction on each button press
+    }
+}
 
+void lvl_to_pulse(uint16_t lvl, uint8_t direction){
+    if(direction == 0){ //Clockwise
+        pulse_width = CW_MIN_PULSE + ((CW_MAX_PULSE - CW_MIN_PULSE) * lvl) / 100;
+    } else { //Counter-Clockwise
+        pulse_width = CCW_MIN_PULSE + ((CCW_MAX_PULSE - CCW_MIN_PULSE) * lvl) / 100;
+    }
 }
 
 int main(void) {
