@@ -9,12 +9,16 @@
 
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
+volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 
-void SYSTICK_Handler(void){
-    adc_value = read_adc(ADC1, ADC_CHANNEL); //Read ADC value from channel 10 (PC0)
-    char string[20];
-    sprintf(string, "ADC Value: %u\r\n", adc_value);
-    send_string(USART2, string);
+void SysTick_Handler(void){
+    // Start ADC conversion, but don't wait for it in the ISR
+    adc_swtstart(ADC1);
+}
+
+void ADC_IRQHandler(void){
+    adc_value = read_adc(ADC1); // Clear EOC flag by reading ADC value
+    value_ready = 1;
 }
 
 void print_data(void){
