@@ -20,7 +20,6 @@ void ADC_IRQHandler(void){
     adc_value = read_adc(ADC1); // Clear EOC flag by reading ADC value
     value_ready = 1;
 }
-
 void print_data(void){
     float rpm_local = rpm;
     display_num((uint16_t)(rpm_local * 10), 1); //Display RPM with one decimal place
@@ -46,6 +45,7 @@ int main(void) {
     init_ssd(10);
     display_num(0, 1);
     PWM_PC6_INIT();
+    set_pin_mode(GPIOC, 0, ANALOG); //PC0 as analog input for ADC
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
 
     while(1){};
