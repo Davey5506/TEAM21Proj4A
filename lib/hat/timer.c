@@ -136,22 +136,3 @@ void init_timer_IRQ(TIM_TypeDef* TIMx, uint16_t priority){
             break;
     }
 }
-
-void TIM3_INIT(void){
-    GPIOC->AFR[0] &= ~((0xF << (PWN_OUT_PIN * 4)) | (0xF << (FEEDBACK_IN_PIN * 4)));
-    GPIOC->AFR[0] |= (2 << (PWN_OUT_PIN *4)) | (2<< (FEEDBACK_IN_PIN *4)); //AF2 for TIM3_CH1 and TIM3_CH2
-
-    const uint32_t TIM3_ARR_VALUE= TIM3_FREQ_HZ / PWM_FREQ_HZ; //20000 for 50Hz
-    const uint16_t NEUTRAL_PULSE_VALUE= SERVO_NEUTRAL_PULSE_WIDTH; //1500 for 1.5ms pulse width
-
-    init_gp_timer(TIM3, TIM3_FREQ_HZ, TIM3_ARR_VALUE, 1); //used helper to PSC,ARR,Counter
-
-    TIM3->CCMR1 &= ~TIM_CCMR1_CC1S_Msk; //CC1 channel is output
-    TIM3->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2; //PWM mode 
-    TIM3->CCER |= TIM_CCER_CC1E; //enabled capture/compare 1 output
-    TIM3->CCR1 = NEUTRAL_PULSE_VALUE; //set the pulse width for neutral position
-
-    TIM3->DIER |= TIM_DIER_CC1IE | TIM_DIER_CC2IE; //Enable interrupt for capture/compare 1 and 2
-    init_timer_IRQ(TIM3, 2);//used helper to setup NVIC
-
-}
