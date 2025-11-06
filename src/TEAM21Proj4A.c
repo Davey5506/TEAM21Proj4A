@@ -7,6 +7,9 @@
 #define TIM3_ARR (TIM3_FREQ_HZ * PWM_FREQ_HZ) // Auto-reload value for 50Hz
 #define SERVO_NEUTRAL_PULSE_WIDTH 1500 // 1.5ms pulse width for neutral position
 
+volatile uint32_t pulse_width = 0; // Pulse width in microseconds
+volatile uint32_t period = 0; 
+
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
 
@@ -36,13 +39,25 @@ void PWM_PC6_INIT(void){
     TIM3->CR1 |= TIM_CR1_CEN; //Enable TIM3
 }
 
-void TIM3_IRQHandler(void){
+void TIM3_IRQHandler(void){ //meaures pulse width and period of feedback signal
+    if(TIM3->SR & TIM_SR_CC1IF){
 
+        uint32_t ccr2= TIM3->CCR2;
+        uint32_t ccr1= TIM3->CCR1;
+
+        pulse_width=ccr2;
+        period=ccr1;
+
+        TIM3->SR &= ~TIM_SR_CC1IF;
+    }
+    if (TIM3->SR & TIM_SR_UIF){
+        TIM3->SR &= ~TIM_SR_UIF;
+    }
 }
 
 
 void EXTI15_10_IRQHandler(void){
-    
+
 }
 
 
