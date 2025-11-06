@@ -7,6 +7,11 @@
 #define TIM3_ARR (TIM3_FREQ_HZ * PWM_FREQ_HZ) // Auto-reload value for 50Hz
 #define SERVO_NEUTRAL_PULSE_WIDTH 1500 // 1.5ms pulse width for neutral position
 
+#define CW_MAX_PULSE 1480
+#define CW_MIN_PULSE 1280
+#define CCW_MAX_PULSE 1520
+#define CCW_MIN_PULSE 1720
+
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint32_t period = 0; 
 
