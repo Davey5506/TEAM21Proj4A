@@ -77,6 +77,18 @@ void init_adc(ADC_TypeDef* ADCx, uint8_t channel){
     ADCx->CR2 |= ADC_CR2_ADON; // Enable ADC
 }
 
+void adc_swtstart(ADC_TypeDef* ADCx){
+    ADCx->CR2 |= ADC_CR2_SWSTART;
+}
+
+void init_adc_interrupt(ADC_TypeDef* ADCx, uint8_t priority){
+    ADCx->CR1 |= ADC_CR1_EOCIE; // Enable End of Conversion interrupt
+    if (ADCx == ADC1) {
+        NVIC_EnableIRQ(ADC_IRQn);
+        NVIC_SetPriority(ADC_IRQn, priority);
+    }
+}
+
 uint16_t read_adc(ADC_TypeDef* ADCx){
     ADCx->CR2 |= ADC_CR2_SWSTART;
     while(!(ADCx->SR & ADC_SR_EOC));
