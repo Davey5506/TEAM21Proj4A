@@ -90,7 +90,7 @@ void init_ultrasound(void);
 void int_to_string(int num, char* str, uint16_t len);
 void init_servo(SERVO_t* servo);
 void init_adc(ADC_TypeDef* ADCx, uint8_t channel);
-uint16_t read_adc(ADC_TypeDef* ADCx, uint8_t channel);
+uint16_t read_adc(ADC_TypeDef* ADCx);
 
 
 #endif //HAT_H
