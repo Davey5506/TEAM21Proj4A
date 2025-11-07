@@ -32,8 +32,8 @@ volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 void print_data(void){
     if(value_ready){
         char string[80];
-        sprintf(string, "ADC value: %u, dir: %s,servo (us): %u, rpm: %.3f\r\n", 
-                adc_value, direction, pulse_width,rpm);
+        sprintf(string, "ADC value: %u, dir: %s, servo (us):%lu, rpm: %.3f\r\n",
+                adc_value, (direction ? "CCW" : "CW"), pulse_width, rpm);
 
         send_string(USART2, string);
         display_num(adc_value, 0);
