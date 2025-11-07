@@ -115,14 +115,6 @@ void EXTI15_10_IRQHandler(void){
     }
 }
 
-void lvl_to_pulse(uint16_t lvl, uint8_t direction){
-    if(direction == 0){ //Clockwise
-        pulse_width = CW_MIN_PULSE + ((CW_MAX_PULSE - CW_MIN_PULSE) * lvl) / 100;
-    } else { //Counter-Clockwise
-        pulse_width = CCW_MIN_PULSE + ((CCW_MAX_PULSE - CCW_MIN_PULSE) * lvl) / 100;
-    }
-}
-
 int main(void) {
     init_usart(115200);
     init_sys_tick(SYSTEM_FREQ); // 1s tick
