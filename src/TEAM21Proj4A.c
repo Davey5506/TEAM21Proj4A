@@ -9,8 +9,8 @@
 
 #define CW_MAX_PULSE 1480
 #define CW_MIN_PULSE 1280
-#define CCW_MAX_PULSE 1520
-#define CCW_MIN_PULSE 1720
+#define CCW_MIN_PULSE 1520
+#define CCW_MAX_PULSE 1720
 
 SERVO_t wheel = {
     .SERVO_PIN_PORT = GPIOC,
@@ -21,6 +21,7 @@ SERVO_t wheel = {
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint32_t period = 0; 
 volatile uint8_t direction = 0; // 0 for CW, 1 for CCW
+volatile uint8_t stop = 0;
 
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
@@ -102,7 +103,7 @@ void SysTick_Handler(void){
 
 void ADC_IRQHandler(void){
     adc_value = read_adc(ADC1); // Clear EOC flag by reading ADC value
-    pulse_width = lvl_to_pulse(adc_value, direction);
+    pulse_width = stop ? SERVO_NEUTRAL_PULSE_WIDTH : lvl_to_pulse(adc_value, direction);
     servo_speed_set(pulse_width);
     print_data();
     value_ready = 1;
@@ -111,17 +112,42 @@ void ADC_IRQHandler(void){
 void EXTI15_10_IRQHandler(void){
     if(EXTI->PR & EXTI_PR_PR13){
         EXTI->PR |= EXTI_PR_PR13; //Clear pending register
-        direction ^= 1; //Toggle direction on each button press
+        if(!stop){
+            stop = !stop;
+            pulse_width = SERVO_NEUTRAL_PULSE_WIDTH; //Stop the wheel
+        }else{
+            stop = !stop;
+            direction = !direction;
+        }
     }
 }
 
 int main(void) {
+    // Initialize USART2 for serial communication at 115200 baud
     init_usart(115200);
+    
     init_sys_tick(SYSTEM_FREQ); // 1s tick
+    
+    // Initialize SSD
     init_ssd(10);
     display_num(0, 1);
-    PWM_PC6_INIT();
+    
+    
+    PWM_PC6_INIT(); // Initialize PWM on PC6
+
     set_pin_mode(GPIOC, 0, ANALOG); //PC0 as analog input for ADC
+    
+    // Configure EXTI for button on PC13
+    set_pin_mode(GPIOC, 13, INPUT); //PC13 as input for button
+    set_pin_pull(GPIOC, 13, PULL_UP); //Enable pull-up resistor
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN_Msk; //Enable SYSCFG clock
+    SYSCFG->EXTICR[3] |= SYSCFG_EXTICR4_EXTI13_PC;//Map EXTI13 to PC13
+    NVIC_EnableIRQ(EXTI15_10_IRQn); //Enable EXTI15_10 interrupt
+    NVIC_SetPriority(EXTI15_10_IRQn, 10); //Set priority to 1
+    EXTI->IMR |= EXTI_IMR_MR13; //Unmask EXTI13
+    EXTI->RTSR |= EXTI_RTSR_TR13; //Rising trigger
+    
+    // Initialize ADC1
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
     init_adc_interrupt(ADC1, 2); // Enable ADC interrupt with priority 2
 
