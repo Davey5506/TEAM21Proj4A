@@ -67,6 +67,18 @@ void TIM3_INIT(void){
     init_timer_IRQ(TIM3, 2);//used helper to setup NVIC
 }
 
+uint32_t lvl_to_pulse(uint16_t lvl, uint8_t direction){
+    if(direction == 0){ //Clockwise
+        return umap(lvl, 0,4095, CW_MIN_PULSE, CW_MAX_PULSE);
+    } else { //Counter-Clockwise
+        return umap(lvl, 0, 4095, CCW_MIN_PULSE, CCW_MAX_PULSE);
+    }
+}
+
+void servo_speed_set(uint32_t pulse_width){
+    TIM3->CCR1= pulse_width;
+}
+
 void TIM3_IRQHandler(void){ //meaures pulse width and period of feedback signal
     if(TIM3->SR & TIM_SR_CC1IF){
 
