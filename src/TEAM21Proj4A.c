@@ -19,7 +19,6 @@ SERVO_t wheel = {
 };
 
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
-volatile uint32_t period = 0; 
 volatile uint8_t direction = 0; // 0 for CW, 1 for CCW
 volatile uint8_t stop = 0;
 
@@ -81,16 +80,6 @@ void servo_speed_set(uint32_t pulse_width){
 }
 
 void TIM3_IRQHandler(void){ //meaures pulse width and period of feedback signal
-    if(TIM3->SR & TIM_SR_CC1IF){
-
-        uint32_t ccr2= TIM3->CCR2;
-        uint32_t ccr1= TIM3->CCR1;
-
-        pulse_width=ccr2;
-        period=ccr1;
-
-        TIM3->SR &= ~TIM_SR_CC1IF;
-    }
     if (TIM3->SR & TIM_SR_UIF){
         TIM3->SR &= ~TIM_SR_UIF;
     }
@@ -122,6 +111,15 @@ void EXTI15_10_IRQHandler(void){
     }
 }
 
+void EXTI9_5_IRQHandler(void){
+    if(EXTI->PR & EXTI_PR_PR7){
+        EXTI->PR |= EXTI_PR_PR7; //Clear pending register
+        if(read_pin(GPIOC, 7)){ //Rising edge
+            TIM3->CNT = 0; //Reset counter on rising edge
+        } else { //Falling edge
+        
+
+    }
 int main(void) {
     // Initialize USART2 for serial communication at 115200 baud
     init_usart(115200);
@@ -134,7 +132,7 @@ int main(void) {
     
     
     PWM_PC6_INIT(); // Initialize PWM on PC6
-
+    
     set_pin_mode(GPIOC, 0, ANALOG); //PC0 as analog input for ADC
     
     // Configure EXTI for button on PC13
@@ -146,7 +144,17 @@ int main(void) {
     NVIC_SetPriority(EXTI15_10_IRQn, 10); //Set priority to 1
     EXTI->IMR |= EXTI_IMR_MR13; //Unmask EXTI13
     EXTI->RTSR |= EXTI_RTSR_TR13; //Rising trigger
-    
+
+    // Configure EXTI for PC7
+    set_pin_mode(GPIOC, 7, INPUT); //PC7 as input for feedback signal
+    set_pin_pull(GPIOC, 7, PULL_DOWN); //Enable pull-down resistor
+    SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI7_PC; //Map EXTI7 to PC7
+    EXTI->IMR |= EXTI_IMR_MR7; //Unmask EXTI7
+    EXTI->RTSR |= EXTI_RTSR_TR7; //Rising trigger
+    EXTI->FTSR |= EXTI_FTSR_TR7; //Falling trigger
+    NVIC_EnableIRQ(EXTI9_5_IRQn); //Enable EXTI9_5 interrupt
+    NVIC_SetPriority(EXTI9_5_IRQn, 10); //Set priority to 1
+
     // Initialize ADC1
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
     init_adc_interrupt(ADC1, 2); // Enable ADC interrupt with priority 2
