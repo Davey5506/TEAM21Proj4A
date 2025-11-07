@@ -47,12 +47,11 @@ void PWM_PC6_INIT(void){
     TIM3->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2; //PWM mode 1
     TIM3->CCER |= TIM_CCER_CC1E; //Enable capture/compare 1 output
     TIM3->CCR1 = SERVO_NEUTRAL_PULSE_WIDTH; //Set pulse width for neutral position (1.5ms)
-    TIM3->CR1 |= TIM_CR1_CEN; //Enable TIM3
 }
 
 void TIM3_INIT(void){
-    GPIOC->AFR[0] &= ~((0xF << (PWN_OUT_PIN * 4)) | (0xF << (FEEDBACK_IN_PIN * 4)));
-    GPIOC->AFR[0] |= (2 << (PWN_OUT_PIN *4)) | (2<< (FEEDBACK_IN_PIN *4)); //AF2 for TIM3_CH1 and TIM3_CH2
+    GPIOC->AFR[0] &= ~((0xF << (wheel.SERVO_PWM_PIN * 4)) | (0xF << (wheel.SERVO_FEEDBACK_PIN * 4)));
+    GPIOC->AFR[0] |= (2 << (wheel.SERVO_PWM_PIN *4)) | (2<< (wheel.SERVO_FEEDBACK_PIN *4)); //AF2 for TIM3_CH1 and TIM3_CH2
 
     const uint32_t TIM3_ARR_VALUE= TIM3_FREQ_HZ / PWM_FREQ_HZ; //20000 for 50Hz
     const uint16_t NEUTRAL_PULSE_VALUE= SERVO_NEUTRAL_PULSE_WIDTH; //1500 for 1.5ms pulse width
