@@ -26,15 +26,6 @@ volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
 volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 
-void SysTick_Handler(void){
-    // Start ADC conversion, but don't wait for it in the ISR
-    adc_swtstart(ADC1);
-}
-
-void ADC_IRQHandler(void){
-    adc_value = read_adc(ADC1); // Clear EOC flag by reading ADC value
-    value_ready = 1;
-}
 void print_data(void){
     float rpm_local = rpm;
     display_num((uint16_t)(rpm_local * 10), 1); //Display RPM with one decimal place
@@ -86,6 +77,19 @@ void TIM3_IRQHandler(void){ //meaures pulse width and period of feedback signal
     if (TIM3->SR & TIM_SR_UIF){
         TIM3->SR &= ~TIM_SR_UIF;
     }
+}
+
+void SysTick_Handler(void){
+    // Start ADC conversion, but don't wait for it in the ISR
+    adc_swtstart(ADC1);
+}
+
+void ADC_IRQHandler(void){
+    adc_value = read_adc(ADC1); // Clear EOC flag by reading ADC value
+    pulse_width = lvl_to_pulse(adc_value, direction);
+    servo_speed_set(pulse_width);
+    print_data();
+    value_ready = 1;
 }
 
 void EXTI15_10_IRQHandler(void){
