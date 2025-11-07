@@ -35,6 +35,7 @@ volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 void print_data(void){
     float local_rpm = rpm;
     local_rpm = local_rpm < 0 ? -local_rpm : local_rpm; //Absolute value
+    local_rpm = stop ? 0 : local_rpm;
     if(value_ready){
         char string[80];
         char dchar[5];
