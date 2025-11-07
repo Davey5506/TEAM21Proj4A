@@ -143,8 +143,6 @@ int main(void) {
     
     // Initialize SSD
     init_ssd(10);
-    display_num(0, 1);
-    
     
     PWM_PC6_INIT(); // Initialize PWM on PC6
     
