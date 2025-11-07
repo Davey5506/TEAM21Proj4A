@@ -33,6 +33,8 @@ volatile uint16_t adc_value = 0; //ADC Value
 volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 
 void print_data(void){
+    float local_rpm = rpm;
+    local_rpm = local_rpm < 0 ? -local_rpm : local_rpm; //Absolute value
     if(value_ready){
         char string[80];
         char dchar[5];
@@ -43,11 +45,12 @@ void print_data(void){
         }else{
             strcpy(dchar, "CW");
         }
+        
         sprintf(string, "ADC value: %u, dir: %s, servo (us):%lu, rpm: %.3f\r\n",
-                adc_value, dchar, pulse_width, rpm);
+        adc_value, dchar, pulse_width, local_rpm);
 
         send_string(USART2, string);
-        display_num(rpm, 0);
+        display_num(local_rpm * 10, 1);
         value_ready = 0;
     }
 }
