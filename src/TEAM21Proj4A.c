@@ -27,8 +27,13 @@ volatile uint16_t adc_value = 0; //ADC Value
 volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
 
 void print_data(void){
-    float rpm_local = rpm;
-    display_num((uint16_t)(rpm_local * 10), 1); //Display RPM with one decimal place
+    if(value_ready){
+        char string[35];
+        sprintf(string, "Pulse Width: %lu\tDirection: %s\r\n", pulse_width, direction ? "CCW" : "CW");
+        send_string(USART2, string);
+        display_num(adc_value, 0);
+        value_ready = 0;
+    }
 }
 
 void PWM_PC6_INIT(void){
@@ -117,14 +122,6 @@ int main(void) {
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
     init_adc_interrupt(ADC1, 2); // Enable ADC interrupt with priority 2
 
-    while(1){
-        if(value_ready){
-            char string[30];
-            sprintf(string, "ADC Value: %u\r\n", adc_value);
-            send_string(USART2, string);
-            display_num(adc_value, 0);
-            value_ready = 0;
-        }
-    };
+    while(1){};
     return 0;
 }
