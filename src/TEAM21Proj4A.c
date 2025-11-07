@@ -22,6 +22,8 @@ SERVO_t wheel = {
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint8_t direction = 0; // 0 for CW, 1 for CCW
 volatile uint8_t stop = 0;
+volatile uint32_t feedback_start = 0;
+volatile uint32_t feedback_end = 0;
 
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
