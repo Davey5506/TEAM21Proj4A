@@ -6,6 +6,8 @@
 #define TIM3_FREQ_HZ 1000000 // 1MHz timer clock for 1us resolution
 #define TIM3_ARR ((TIM3_FREQ_HZ / PWM_FREQ_HZ) - 1) // Auto-reload value for 50Hz (20000 - 1 = 19999)
 #define FEEDBACK_PERIOD_US 1100
+#define FEEDBACK_MAX_DUTY_CYCLE 0.971f
+#define FEEDBACK_MIN_DUTY_CYCLE 0.029f
 #define SERVO_NEUTRAL_PULSE_WIDTH 1500 // 1.5ms pulse width for neutral position
 
 #define CW_MAX_PULSE 1480
@@ -22,9 +24,9 @@ SERVO_t wheel = {
 volatile uint32_t pulse_width = 0; // Pulse width in microseconds
 volatile uint8_t direction = 0; // 0 for CW, 1 for CCW
 volatile uint8_t stop = 0;
-volatile uint32_t feedback_start = 0;
-volatile uint32_t feedback_end = 0;
-
+volatile uint32_t feedback_timings[2];
+volatile uint32_t pulse_start_times[2];
+volatile float angular_positions[2]; //Angular position in degrees
 volatile float rpm = 0; //Rotational Speed in RPM
 volatile uint16_t adc_value = 0; //ADC Value
 volatile uint8_t value_ready = 0; //Flag to indicate new ADC value is ready
@@ -118,11 +120,19 @@ void EXTI9_5_IRQHandler(void){
     if(EXTI->PR & EXTI_PR_PR7){
         EXTI->PR |= EXTI_PR_PR7; //Clear pending register
         if(read_pin(GPIOC, 7)){ //Rising edge
-            TIM3->CNT = 0; //Reset counter on rising edge
-        } else { //Falling edge
-        
+            feedback_timings[0] = TIM3->CNT;
 
+        } else { //Falling edge
+            feedback_timings[1] = TIM3->CNT;
+            uint32_t width = feedback_timings[1] >= feedback_timings[0] ? (feedback_timings[1] - feedback_timings[0]) : (TIM3->ARR + 1 - feedback_timings[0] + feedback_timings[1]);
+            float duty_cycle = (float)width / FEEDBACK_PERIOD_US;
+            angular_positions[1] = angular_positions[0];
+            angular_positions[0] = (duty_cycle - FEEDBACK_MIN_DUTY_CYCLE) * (360.0f / (FEEDBACK_MAX_DUTY_CYCLE - FEEDBACK_MIN_DUTY_CYCLE + 1));
+            
+        }
     }
+}
+
 int main(void) {
     // Initialize USART2 for serial communication at 115200 baud
     init_usart(115200);
