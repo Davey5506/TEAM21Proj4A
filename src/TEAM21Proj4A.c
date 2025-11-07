@@ -47,7 +47,7 @@ void print_data(void){
                 adc_value, dchar, pulse_width, rpm);
 
         send_string(USART2, string);
-        display_num(adc_value, 0);
+        display_num(rpm, 0);
         value_ready = 0;
     }
 }
@@ -139,7 +139,7 @@ void EXTI9_5_IRQHandler(void){
             float duty_cycle = (float)width / FEEDBACK_PERIOD_US;
             angular_positions[1] = angular_positions[0];
             angular_positions[0] = (duty_cycle - FEEDBACK_MIN_DUTY_CYCLE) * (360.0f / (FEEDBACK_MAX_DUTY_CYCLE - FEEDBACK_MIN_DUTY_CYCLE + 1));
-            
+            rpm = (angular_positions[0] - angular_positions[1]) * (60.0f / 360.0f) * (1000000.0f / FEEDBACK_PERIOD_US); //RPM calculation
         }
     }
 }
@@ -175,7 +175,7 @@ int main(void) {
     EXTI->RTSR |= EXTI_RTSR_TR7; //Rising trigger
     EXTI->FTSR |= EXTI_FTSR_TR7; //Falling trigger
     NVIC_EnableIRQ(EXTI9_5_IRQn); //Enable EXTI9_5 interrupt
-    NVIC_SetPriority(EXTI9_5_IRQn, 10); //Set priority to 1
+    NVIC_SetPriority(EXTI9_5_IRQn, 0); //Set priority to 1
 
     // Initialize ADC1
     init_adc(ADC1, 10); // Initialize ADC1 on channel 10 (PC0)
